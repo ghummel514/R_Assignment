@@ -1,0 +1,84 @@
+---
+title: "Energy and Climate Spending"
+author: "Gabby Hummel"
+date: "April 21, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+library(ggplot2)
+library(dplyr)
+
+#Import Data
+setwd("C:/Users/ghummel/Desktop/Code/bigData")
+climateSpending <- read.csv("climate_spending.csv", header = T)
+energySpending <- read.csv("energy_spending.csv", header = T)
+rDSpending <- read.csv("fed_r_d_spending.csv", header = T)
+```
+
+## Climate Spending Findings
+
+This analysis concerns research budgets offederal research and development agencies. For this analysis, I looked at the research budgets dedicated to climate research, specifically within the Department of Agriculture, Commerce, Energy, Interior, NASA, and the National Science Foundation. This analysis concerned data spanning from the year 2000 to the year 2017.
+
+As can be seen below, NASA was consistently the most expensive department for climate research. Similarly, it appears that there was a peak in spending for nearly all departments between 2009 and 2010, the one exception being NASA. 
+
+
+```{r climate budget}
+
+#Climate R&D spending by year, grouped by department
+climateSpending %>% 
+  group_by(department) %>% #groups by department
+  ggplot(aes(x = year, y = gcc_spending, col = department)) +
+  labs(main = "Climate Spending",x = "Year", y = "R&D Dollars in inflation-adjusted (constant) dollars") +
+  geom_line()
+```
+
+## Energy Spending Findings
+
+The research budgets were analyzed to understand spending patterns related to energy research. The departments that were studied included the Atomic Energy Defense, Basic Energy Science, Biological and Environmental Research, Energy Efficiency and Rewnewable Energy, Fossil Energy, Fusion Energy, Fusion Energy Sciences, High-Energy Physics, Nuclear Energy, Nuclear Physics, the Office of Science Research and Design. The most expensive departments, as can be seen below, were the Atomic Energy Defense and the Office of SCience Research and Design. Like Climate R&D, there appears to have been a peak in spending between 2009-2010 in nearly all departments. Similarly, 2016-2017 saw an increase in spending in nearly all departments, a trend that dates back a few years for many departments. While this was true for some departments realted to climate research and design, it was not as generally true as it was for energy research and design. 
+
+```{r pressure, echo=FALSE}
+#energy r&D spending by year, grouped by department
+energySpending %>% 
+  group_by(department) %>% # groups by department
+  ggplot(aes(x = year, y = energy_spending, col = department)) +
+  labs(main = "Emergy Spending",x = "Year", y = "R&D Dollars in inflation-adjusted (constant) dollars") +
+  geom_line()
+```
+
+
+## Total R&D Spending
+
+To understand the relationship between GDP and total R&D Spending, I plotted the two against each other. As can be seen, the two are directly correlated, as R&D spending increases and decreases as the GDP increases and decreases. Similarly, as can be seen below the original plot, between 0.18 and 0.24% of the GDP was dedicated to federal R&D budgets. It does not appear from this analysis that there was a pattern in the relationship between the percent of GDP and time, but this is likely due to a lack of seasonality in economics and pressures to fund climate and energy R&D departments.Unsurprisingly, there was a sharp increase in the percent of the GDP represented by R&D spending from 2009-2010, which correlates to the increase in spending during this time seen in both climate and energy research.
+
+Similarly, there has been a general decline in the percentage of total outlays represented by the discretionary outlays. 
+
+```{r}
+#defines variables
+rdx <- rDSpending$year
+rdy1 <- rDSpending$total_outlays
+rdy2 <- rDSpending$discretionary_outlays
+rdy3 <- rDSpending$gdp
+percentGDP <- rdy1/rdy3 #calcualtes percent of spending over GDP
+percentOutlays <- rdy2/rdy1 # calculates perent of discretionary outlays over total outlays
+
+#plots GDP as it compares to Total Outlays
+plot(rdx, rdy3, type = "l", col = "red", main = "GDP as it compares to Total Outlays")
+lines(rdx, rdy1, type = "l", col = "blue")
+lines(rdx, rdy3)
+legend('topleft', c("GDP", "Total Outlays") , 
+       lty=1, col=c('Red', 'Blue'), bty='n', cex=.75)
+
+#Plots percent of GDP represented by R&D Spending
+plot(rdx, percentGDP, type = "l", col = "red", xlab = "Year", ylab = "Percent of GDP", main = "Percent of GDP Represented by R&D Spending")
+
+#Plots Percent of discretionary outlays over total outlays
+plot(rdx, percentOutlays, type = "l", col = "red", xlab = "Year", ylab = "Percent of discretionary outlays over total Outlays", main = "Percent of Discretionary Outlays over Total Outlays")
+
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+## What This May Mean
